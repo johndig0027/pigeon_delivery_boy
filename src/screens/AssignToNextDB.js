@@ -3,14 +3,8 @@ import {
   StyleSheet,
   View,
   ScrollView,
-  FlatList,
   Image,
-  RefreshControl,
   Text,
-  TextInput,
-  KeyboardAvoidingView,
-  Keyboard,
-  ImageBackground,
   TouchableOpacity,
 } from 'react-native';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
