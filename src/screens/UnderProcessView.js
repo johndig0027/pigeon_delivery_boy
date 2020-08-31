@@ -10,6 +10,8 @@ import {
   ImageBackground,
 } from 'react-native';
 
+import {connect} from 'react-redux';
+
 import backImage from '../assets/bg_screen.png';
 import {Colors} from '../theme';
 import Header from '../components/base/Header';
@@ -18,17 +20,26 @@ import Icon from '../assets/icons';
 import Button from '../components/base/Button';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import db from '../assets/db.png';
+import {resetRegisration} from '../redux/action';
 
-const RegistrationKYC = props => {
+const UnderProcessView = props => {
   return (
     <ImageBackground style={{flex: 1}} source={backImage}>
       <View style={styles.root}>
+        <Icon.Button
+          type={'back'}
+          onPress={() => {
+            props.navigation.pop(4);
+            props.navigation.pop();
+            props.resetRegisration();
+          }}
+        />
         <Icon type={'logo'} style={styles.logoStyle} />
         <View style={styles.middleParent}>
           <Header style={styles.headerText} text={'UNDER PROCESS'} />
 
           <Text style={styles.mainText}>
-            Thnk you very much for showing interest in pigeonstics. Your
+            Thank you very much for showing interest in pigeonstics. Your
             application is under verification. Please visit our headquater for
             the interview with following documents
           </Text>
@@ -65,7 +76,7 @@ const RegistrationKYC = props => {
           <Text
             style={[
               styles.mainText,
-              {marginTop: 20, color: 'rgba(233,80,72,1)'},
+              {marginTop: 10, color: 'rgba(233,80,72,1)'},
             ]}>
             Please come with original and one xerox copy at 10:30 AM to 6:30 PM
             on following address
@@ -74,7 +85,7 @@ const RegistrationKYC = props => {
           <Text
             style={{
               textAlign: 'center',
-              marginTop: 20,
+              marginTop: 10,
               fontSize: 10,
               fontFamily: 'ProzaLibre-Medium',
               color: '#A1A1A1',
@@ -83,11 +94,12 @@ const RegistrationKYC = props => {
             Near Ishanya Mall, Yerawada | City : PUNE | PIN Code : 411006
           </Text>
           <Button
-            buttonStyle={{marginVertical: 40}}
+            buttonStyle={{marginVertical: 10}}
             text={'OK'}
             onPress={() => {
               props.navigation.pop(4);
               props.navigation.pop();
+              props.resetRegisration();
             }}
           />
         </View>
@@ -96,19 +108,26 @@ const RegistrationKYC = props => {
   );
 };
 
-export default RegistrationKYC;
+// export default UnderProcessView;
+const mapStateToProps = state => ({});
+
+export default connect(
+  mapStateToProps,
+  {resetRegisration},
+)(UnderProcessView);
 const styles = StyleSheet.create({
   root: {flex: 1},
   middleParent: {
     width: '80%',
     backgroundColor: Colors.appGrey,
     borderRadius: 20,
-    marginTop: '10%',
+    marginTop: '5%',
     paddingHorizontal: 16,
     alignSelf: 'center',
+    maxHeight: '80%',
   },
   logoStyle: {
-    marginTop: '20%',
+    marginTop: '1%',
     height: 40,
     width: '100%',
     resizeMode: 'contain',
@@ -133,7 +152,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     borderBottomRightRadius: 20,
   },
-  headerText: {marginTop: 30, marginBottom: 20, alignSelf: 'center'},
+  headerText: {marginTop: 10, marginBottom: 10, alignSelf: 'center'},
   termsText: {
     marginLeft: 16,
     fontFamily: 'ProzaLibre-Medium',

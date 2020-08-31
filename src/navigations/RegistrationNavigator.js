@@ -4,7 +4,9 @@ import RegistrationProfile from '../screens/RegistrationProfile';
 import RegistrationKYC from '../screens/RegistrationKYC';
 import OTPVerification from '../screens/OTPVerification';
 import UnderProcessView from '../screens/UnderProcessView';
-
+import SearchLocation from '../screens/SearchLocation';
+import RegistrationAddress from '../screens/RegistrationAddress';
+import {Colors} from '../theme';
 const Stack = createStackNavigator();
 // const store = configureStore();
 export default function Order(props) {
@@ -42,6 +44,20 @@ export default function Order(props) {
       <Stack.Screen
         name="UnderProcessView"
         component={UnderProcessView}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="SearchLocation"
+        component={SearchLocation}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="RegistrationAddress"
+        component={RegistrationAddress}
         options={{
           headerShown: false,
         }}

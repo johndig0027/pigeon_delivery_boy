@@ -16,9 +16,17 @@ import Hedear from '../components/base/Header';
 import SmallButton from '../components/base/SmallButton';
 import Icon from '../assets/icons';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {connect} from 'react-redux';
+import {sendMsg} from '../redux/action';
+import io from 'socket.io-client';
+import SockJsClient from 'react-stomp';
+
+// import WS from 'react-native-websocket';
 
 const LiveOrderList = props => {
+  let ws = null;
   const [refresh, setRefresh] = useState(false);
+  let socketRef = null;
   const DATA = [
     {
       id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
@@ -42,11 +50,31 @@ const LiveOrderList = props => {
     },
   ];
 
+  useEffect(() => {
+    // var ws = new WebSocket('http://localhost:8080/chat/websocket');
+    // ws.onopen = () => {
+    //   // connection opened
+    //   ws.send('something'); // send a message
+    // };
+    // ws.onmessage = e => {
+    //   // a message was received
+    //   console.log('onmessage : ', e.data);
+    // };
+    // ws.onerror = e => {
+    //   // an error occurred
+    //   console.log('onerror : ', e.message);
+    // };
+    // ws.onclose = e => {
+    //   // connection closed
+    //   console.log(e.code, e.reason);
+    // };
+  }, []);
+
   const onRefresh = () => {};
 
   const getListItem = (item, index) => {
-    console.log('index', index);
-    console.log('Item', item);
+    // console.log('index', index);
+    // console.log('Item', item);
     return (
       <View style={styles.item}>
         <View style={{width: 60}}>
@@ -76,7 +104,69 @@ const LiveOrderList = props => {
             </Text>
           </View>
           <View style={styles.acceptButtonParent}>
-            <SmallButton buttonStyle={styles.declineButton} text={'Decline'} />
+            <SmallButton
+              buttonStyle={styles.declineButton}
+              text={'Decline'}
+              onPress={() => {
+                socketRef.sendMessage(
+                  '/app/chat/rahul',
+                  JSON.stringify({
+                    fromLogin: 'rahul1',
+                    message: 'This is test message',
+                  }),
+                );
+
+                // const request = {message: 'Test Message', from: 'rahul'};
+                // const socket = io('http://localhost:8080', {
+                //   transports: ['websocket', 'polling'],
+                // });
+                // socket.on('connect', () => {
+                //   console.log('connected');
+                // });
+                // const socket = io('http://localhost:8080', {
+                //   transports: ['websocket', 'polling'],
+                //   // extraHeaders: {
+                //   //   Authorization:
+                //   //     'bearer b6fc3071-b94d-4e69-b851-6991077fe92d',
+                //   // },
+                // });
+                // socket.on('/topic/message/rahul', msg => {
+                //   // this.setState({ chatMessages: [...this.state.chatMessages, msg]
+                // });
+                // socket.on('connect', () => {
+                //   console.log('connected');
+                // });
+                // socket.on('connect_error', error => {
+                //   console.log('Error:::', JSON.stringify(error));
+                // });
+                // io.connect('http://localhost:8080/chat/rahul', {
+                //   reconnection: true,
+                //   reconnectionDelay: 500,
+                //   jsonp: false,
+                //   reconnectionAttempts: Infinity,
+                //   transports: ['websocket'],
+                //   extraHeaders: {
+                //     Authorization:
+                //       'bearer b6fc3071-b94d-4e69-b851-6991077fe92d',
+                //   },
+                // });
+                // that.stompClient.subscribe('/queue/update', message => {
+                //   const data = JSON.parse(message.body);
+                //   // Some code here
+                // });
+                // const socket = io('http://localhost:8080', {
+                //   extraHeaders: {
+                //     Authorization:
+                //       'bearer b6fc3071-b94d-4e69-b851-6991077fe92d',
+                //   },
+                // });
+                // socket.connect();
+                // socket.on('app', msg => {
+                //   console.log('Message', msg);
+                // });
+                // props.sendMsg(request);
+              }}
+            />
             <View style={{width: 10}} />
             <SmallButton
               buttonStyle={styles.acceptButton}
@@ -113,11 +203,44 @@ const LiveOrderList = props => {
           }
         />
       </View>
+
+      <SockJsClient
+        url="http://localhost:8080/chat"
+        topics={['/topic/messages/rahul']}
+        // headers={{Authorization: 'bearer b6fc3071-b94d-4e69-b851-6991077fe92d'}}
+        onConnect={() => {
+          console.log('connected');
+        }}
+        onDisconnect={() => {
+          console.log('Disconnected');
+        }}
+        onMessage={msg => {
+          console.log('onMessage :::', msg);
+        }}
+        onConnectFailure={msg => {
+          console.log('onConnectFailure :::', msg);
+        }}
+        ref={client => {
+          socketRef = client;
+        }}
+        debug={true}
+        // autoReconnect={false}
+      />
     </View>
   );
 };
 
-export default LiveOrderList;
+// export default LiveOrderList;
+
+const mapStateToProps = state => ({});
+
+// export default SearchLocation;
+export default connect(
+  mapStateToProps,
+  {
+    sendMsg,
+  },
+)(LiveOrderList);
 const styles = StyleSheet.create({
   root: {flex: 1, backgroundColor: 'rgba(245,245,245,1)'},
   container: {

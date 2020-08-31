@@ -6,6 +6,7 @@ import {Colors} from '../../theme';
 const InputText = props => {
   return (
     <TextInput
+      ref={props.onRef}
       style={[styles.text, props.textStyle]}
       placeholderTextColor={Colors.dullBlue}
       {...props}

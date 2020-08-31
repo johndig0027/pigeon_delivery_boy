@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   ImageBackground,
+  Alert,
 } from 'react-native';
 
 import backImage from '../assets/bg_screen.png';
@@ -17,26 +18,79 @@ import InputText from '../components/base/InputText';
 import Icon from '../assets/icons';
 import Button from '../components/base/Button';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {login, setFromLoginScreen} from '../redux/action';
+import {connect} from 'react-redux';
 import db from '../assets/db.png';
 
 const Login = props => {
+  const [username, setUsername] = useState('rahul');
+  const [password, setPassword] = useState('PEz6AW1R2#');
+
+  const onLoginPress = async () => {
+    if (!username) {
+      Alert.alert('Error', 'Please enter username');
+      return;
+    }
+
+    if (!password) {
+      Alert.alert('Error', 'Please enter password');
+      return;
+    }
+    const {error, response} = await props.login(username, password);
+
+    if (!error) {
+      if (
+        !response.user.isEmailVerified ||
+        !response.user.isMobileNumberVerified
+      ) {
+        props.setFromLoginScreen(true);
+        props.navigation.replace('Register', {
+          initialRouteName: 'OTPVerification',
+          fromLogin: true,
+        });
+        // console.log('Login Response >>>>>', response);
+        return;
+      }
+
+      if (!response.user.isKYCDocSubmitted || !response.user.isKYCDone) {
+        props.navigation.replace('DBStattusView');
+        return;
+      }
+
+      props.navigation.replace('Drawer');
+
+      console.log('Login Response >>>>>', response);
+      // props.navigation.push('Drawer');
+    }
+  };
+
   return (
     <ImageBackground style={{flex: 1}} source={backImage}>
       <View style={styles.root}>
         <Icon type={'logo'} style={styles.logoStyle} />
         <View style={styles.middleParent}>
           <Header style={styles.headerText} text={'LOGIN'} />
+
           <InputText
             // style={{width: '100%', height: 60}}
             placeholder={'User Name'}
+            onChangeText={text => setUsername(text)}
+            autoCapitalize={'none'}
+            value={username}
           />
-          <InputText textStyle={{marginTop: 24}} placeholder={'Password'} />
+          <InputText
+            textStyle={{marginTop: 24}}
+            placeholder={'Password'}
+            onChangeText={text => setPassword(text)}
+            value={password}
+          />
 
           <Button
             buttonStyle={{marginVertical: 50}}
             text={'LOGIN'}
             onPress={() => {
-              props.navigation.push('Drawer');
+              onLoginPress();
+
               console.log('Error');
             }}
           />
@@ -56,7 +110,16 @@ const Login = props => {
   );
 };
 
-export default Login;
+// export default Login;
+
+const mapStateToProps = state => ({
+  isFetching: state.app.isFetching,
+});
+
+export default connect(
+  mapStateToProps,
+  {login, setFromLoginScreen},
+)(Login);
 const styles = StyleSheet.create({
   root: {flex: 1},
   middleParent: {

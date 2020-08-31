@@ -5,6 +5,8 @@ const icons = {
   logo: require('./logo_white.png'),
   menu: require('./menu.png'),
   back: require('./back.png'),
+  roundedclose: require('./rounded_close.png'),
+  profile: require('./profile_sample.png'),
 };
 
 type Props = {
