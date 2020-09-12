@@ -27,6 +27,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBsCtcqdTYjLd1cROn9r-Kvz09eE7WqMs8"/>
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_name" />
+
+
         <!-- You will also only need to add this uses-libray tag -->
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
     </application>

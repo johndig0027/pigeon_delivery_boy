@@ -24,6 +24,7 @@ const initialState = {
   userDetails: undefined,
 
   fromLoginToVerification: false,
+  deviceToken: null,
 
   // firstName: undefined,
   // lastName: undefined,
@@ -144,6 +145,12 @@ const userReducers = (state = initialState, action) => {
       return {
         ...state,
         fromLoginToVerification: action.payload,
+      };
+    }
+    case actionTypes.SET_DEVICE_TOKEN: {
+      return {
+        ...state,
+        deviceToken: action.payload,
       };
     }
     case actionTypes.LOGIN_RESPONSE: {

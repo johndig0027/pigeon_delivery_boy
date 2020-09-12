@@ -17,10 +17,18 @@ export const REGISTER_USER_RESPONSE = 'REGISTER_USER_RESPONSE';
 export const SET_PROFILE_PHOTO = 'SET_PROFILE_PHOTO';
 export const LOGIN_RESPONSE = 'LOGIN_RESPONSE';
 export const SET_FROM_LOGIN_SCREEN = 'SET_FROM_LOGIN_SCREEN';
+export const RESET_USER = 'RESET_USER';
+export const SET_DEVICE_TOKEN = 'SET_DEVICE_TOKEN';
 
-import {storeUserDetails, getUserDetails} from '../../storage';
-import {Alert} from 'react-native';
-import {postWithoutToken, uploadFile, postWithLogin, getWithToken} from './api';
+import {storeUserDetails, getUserDetails, logOutUser} from '../../storage';
+import {Alert, Platform} from 'react-native';
+import {
+  postWithoutToken,
+  uploadFile,
+  postWithLogin,
+  getWithToken,
+  postWithToken,
+} from './api';
 import {requestStarted, requestCompleted} from './app';
 
 export function setFirstName(text) {
@@ -146,6 +154,19 @@ export function setLoginResponse(data) {
   };
 }
 
+export function resetUser() {
+  return {
+    type: RESET_USER,
+  };
+}
+
+export function setDeviceToken(data) {
+  return {
+    type: SET_DEVICE_TOKEN,
+    payload: data,
+  };
+}
+
 export const login = (username, password) => async (dispatch, getState) => {
   //   const {isNetwork, deviceToken} = getState().app;
   //   if (!isNetwork) {
@@ -174,8 +195,20 @@ export const login = (username, password) => async (dispatch, getState) => {
     }
   } catch (err) {
     dispatch(requestCompleted());
-    Alert.alert('Error', err.message);
-    return {error: err.message, response: null};
+    console.log('Error Object ::: ', err);
+    let finalError = '';
+    if (
+      err.message.includes('400') &&
+      err.message.includes('Bad credentials')
+    ) {
+      finalError =
+        'You have entered wrong username or password, Please try again';
+    } else {
+      finalError = err.message;
+    }
+
+    Alert.alert('Error', finalError);
+    return {error: finalError, response: null};
   }
 };
 
@@ -200,6 +233,7 @@ export const registerUser = request => async (dispatch, getState) => {
       return {error: null, response: response.data};
     } else {
       Alert.alert('Error', response.data.message);
+
       return {error: response.data.error, response: null};
     }
   } catch (err) {
@@ -358,6 +392,70 @@ export const getKYCDetails = () => async (dispatch, getState) => {
     }
   } catch (err) {
     dispatch(requestCompleted());
+    return {error: err.message, response: null};
+  }
+};
+
+export const logout = () => async (dispatch, getState) => {
+  const {sessionToken} = getState().user;
+  dispatch(requestStarted());
+  try {
+    const response = await postWithToken(
+      'user/logoutUser',
+      {},
+      sessionToken,
+      dispatch,
+    );
+    dispatch(requestCompleted());
+    console.log('Response', response);
+    if (response.status === 200) {
+      logOutUser();
+      return {error: null, response: response.data};
+    }
+  } catch (err) {
+    dispatch(requestCompleted());
+    return {error: err.message, response: null};
+  }
+};
+
+export const saveUserToken = token => async (dispatch, getState) => {
+  //   const {isNetwork, deviceToken} = getState().app;
+  //   if (!isNetwork) {
+  //     Alert.alert('Error', 'Please check your network connectivity');
+  //     return;
+  //   }
+  // console.log("Current Device Token :: CreateAccount::: ", deviceToken);
+  const {userDetails} = getState().user;
+  let username = null;
+  if (userDetails) {
+    username = userDetails.username;
+  }
+  const request = {
+    username,
+    token,
+    device: Platform.OS,
+    appType: 'DB',
+  };
+
+  try {
+    dispatch(requestStarted());
+    const response = await postWithoutToken(
+      'user/saveToken',
+      request,
+      dispatch,
+    );
+    console.log('Response Token Save', response);
+    dispatch(requestCompleted());
+    if (response.status === 200) {
+      return {error: null, response: response.data};
+    } else {
+      Alert.alert('Error', response.data.message);
+
+      return {error: response.data.error, response: null};
+    }
+  } catch (err) {
+    dispatch(requestCompleted());
+    Alert.alert('Error', err.message);
     return {error: err.message, response: null};
   }
 };

@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import {
   StyleSheet,
   View,
+  Alert,
   ScrollView,
   FlatList,
   Image,
@@ -19,9 +20,20 @@ import SmallButton from '../components/base/SmallButton';
 import Icon from '../assets/icons';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
+import {connect} from 'react-redux';
+import {
+  collectOrder,
+  updateSelectedOrderStatus,
+  startLocationTracking,
+} from '../redux/action';
+import box from '../assets/icons/box.png';
+import deliveryBoy from '../assets/icons/delivery.png';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const AcceptOrderOTP = props => {
-  let mapObj = null;
+  let mapObj = useRef();
+  const [lineCoordinate, setLineCoordinate] = useState([]);
+  const [userLocation, setUserLocation] = useState();
   const [code, setCode] = useState();
   const onCodeFilled = async codeText => {
     console.log(codeText);
@@ -297,6 +309,65 @@ const AcceptOrderOTP = props => {
       ],
     },
   ];
+
+  useEffect(() => {
+    if (mapObj && userLocation) {
+      const MARKERS = [
+        {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+        },
+        {
+          latitude: props.selectedOrder.toAddress.latitude,
+          longitude: props.selectedOrder.toAddress.longitude,
+        },
+      ];
+      const DEFAULT_PADDING = {top: 60, right: 40, bottom: 20, left: 40};
+
+      mapObj.fitToCoordinates(MARKERS, {
+        edgePadding: DEFAULT_PADDING,
+        animated: true,
+      });
+
+      setLineCoordinate(MARKERS);
+      // updateStatus('COLLECTING');
+    }
+  }, [mapObj, userLocation]);
+
+  const getPaymentMethod = () => {
+    const paymentMode = props.selectedOrder.paymentMode;
+    var res = paymentMode.replace('_', ' ');
+    return res;
+  };
+
+  const updateStatus = async status => {
+    if (!code) {
+      Alert.alert('Error', 'Please enter customer OTP');
+      return;
+    }
+
+    if (code.length !== 6) {
+      Alert.alert('Error', 'Please enter valid customer OTP');
+      return;
+    }
+
+    const request = {
+      lat: userLocation.latitude,
+      lng: userLocation.longitude,
+      orderStatus: status,
+      pigeonId: props.selectedOrder.pigeonId,
+      otp: parseInt(code),
+    };
+
+    const {error, response} = await props.collectOrder(request);
+    console.log('Response >>>>', response);
+    if (!error) {
+      props.updateSelectedOrderStatus(status);
+      props.startLocationTracking();
+      props.navigation.replace('CurrentOrderPage');
+    }
+  };
+
   return (
     <View style={styles.root}>
       <View style={styles.navBarStyle}>
@@ -313,65 +384,109 @@ const AcceptOrderOTP = props => {
           text={'Order Accept'}
           style={{fontSize: 20, marginVertical: 10, marginLeft: 10}}
         />
-        <View style={{height: '45%', backgroundColor: 'red'}}>
+        <View style={{height: '35%', backgroundColor: 'red'}}>
           <MapView
             ref={ref => (mapObj = ref)}
             style={{height: '100%'}}
             provider={PROVIDER_GOOGLE}
             customMapStyle={mapTheme}
-            initialRegion={{
-              latitude: 18.508357,
-              longitude: 73.810067,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
             scrollEnabled={false}
-          />
-        </View>
-
-        <View style={{flex: 1, paddingHorizontal: 20}}>
-          <View style={styles.otpView}>
-            <View style={styles.otpSubParent}>
-              <Text style={styles.otpHeader}>OTP</Text>
-              <OTPInputView
-                style={styles.otpBoxView}
-                pinCount={6}
-                code={code}
-                onCodeChanged={codeText => setCode(codeText)}
-                autoFocusOnLoad
-                codeInputFieldStyle={styles.underlineStyleBase}
-                codeInputHighlightStyle={styles.underlineStyleHighLighted}
-                onCodeFilled={codeText => onCodeFilled(codeText)}
-                placeholderCharacter={'X'}
-                placeholderTextColor={'rgba(176,199,197,1)'}
+            showsUserLocation={true}
+            onUserLocationChange={coordinate => {
+              setUserLocation(coordinate.nativeEvent.coordinate);
+              // console.log('XXXXXXXXXXXX :', coordinate.nativeEvent.coordinate);
+            }}>
+            {userLocation ? (
+              <Marker
+                coordinate={{
+                  latitude: Number(userLocation.latitude),
+                  longitude: Number(userLocation.longitude),
+                }}
+                calloutAnchor={{x: 0.45, y: 0.3}}
+                icon={deliveryBoy}
+                tracksViewChanges={false}
               />
-            </View>
+            ) : null}
 
-            <View style={styles.paymentParent}>
-              <View style={styles.paymentView}>
-                <Text style={styles.whiteText}>PAYMENT</Text>
-                <Text style={styles.yellowText}>COD</Text>
-              </View>
-              <View style={styles.blueDivider} />
-              <View style={styles.paymentView}>
-                <Text style={styles.whiteText}>PAYMENT STATUS</Text>
-                <Text style={styles.yellowText}>Completed</Text>
-              </View>
-            </View>
-          </View>
+            <Marker
+              coordinate={{
+                latitude: Number(props.selectedOrder.toAddress.latitude),
+                longitude: Number(props.selectedOrder.toAddress.longitude),
+              }}
+              calloutAnchor={{x: 0.45, y: 0.3}}
+              icon={box}
+              tracksViewChanges={false}
+            />
 
-          <SmallButton
-            buttonStyle={{width: '40%', alignSelf: 'center', marginTop: 40}}
-            text={'START'}
-            onPress={() => props.navigation.push('CurrentOrderPage')}
-          />
+            {lineCoordinate && lineCoordinate.length === 2 ? (
+              <Polyline
+                coordinates={lineCoordinate}
+                strokeColor="#000"
+                fillColor={Colors.appBlue}
+                strokeWidth={3}
+                geodesic={true}
+                lineDashPhase={2}
+              />
+            ) : null}
+          </MapView>
         </View>
+
+        <KeyboardAwareScrollView style={{flex: 1}}>
+          <View style={{flex: 1, paddingHorizontal: 20}}>
+            <View style={styles.otpView}>
+              <View style={styles.otpSubParent}>
+                <Text style={styles.otpHeader}>OTP</Text>
+                <OTPInputView
+                  style={styles.otpBoxView}
+                  pinCount={6}
+                  code={code}
+                  onCodeChanged={codeText => setCode(codeText)}
+                  autoFocusOnLoad
+                  codeInputFieldStyle={styles.underlineStyleBase}
+                  codeInputHighlightStyle={styles.underlineStyleHighLighted}
+                  onCodeFilled={codeText => onCodeFilled(codeText)}
+                  placeholderCharacter={'X'}
+                  placeholderTextColor={'rgba(176,199,197,1)'}
+                />
+              </View>
+
+              <View style={styles.paymentParent}>
+                <View style={styles.paymentView}>
+                  <Text style={styles.whiteText}>PAYMENT</Text>
+                  <Text style={styles.yellowText}>{getPaymentMethod()}</Text>
+                </View>
+                <View style={styles.blueDivider} />
+                <View style={styles.paymentView}>
+                  <Text style={styles.whiteText}>PAYMENT STATUS</Text>
+                  <Text style={styles.yellowText}>Completed</Text>
+                </View>
+              </View>
+            </View>
+
+            <SmallButton
+              buttonStyle={{width: '40%', alignSelf: 'center', marginTop: 40}}
+              text={'START'}
+              onPress={() => updateStatus('INPROGRESS')}
+            />
+          </View>
+        </KeyboardAwareScrollView>
       </View>
     </View>
   );
 };
 
-export default AcceptOrderOTP;
+// export default AcceptOrderOTP;
+
+const mapStateToProps = state => ({
+  userDetails: state.user.userDetails,
+  selectedOrder: state.order.selectedOrder,
+});
+
+// export default SearchLocation;
+export default connect(
+  mapStateToProps,
+  {collectOrder, updateSelectedOrderStatus, startLocationTracking},
+)(AcceptOrderOTP);
 const styles = StyleSheet.create({
   root: {flex: 1, backgroundColor: 'white'},
   container: {
@@ -453,13 +568,12 @@ const styles = StyleSheet.create({
   bottomButtonParent: {height: 40, flexDirection: 'row', paddingHorizontal: 16},
 
   otpView: {
-    height: '50%',
     backgroundColor: Colors.headerBlue,
     marginTop: 30,
     borderRadius: 5,
   },
   otpSubParent: {
-    height: '50%',
+    height: 100,
     width: '100%',
     backgroundColor: Colors.buttonBlue,
     borderRadius: 5,

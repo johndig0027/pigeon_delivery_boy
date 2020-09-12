@@ -7,6 +7,12 @@ const icons = {
   back: require('./back.png'),
   roundedclose: require('./rounded_close.png'),
   profile: require('./profile_sample.png'),
+  home: require('./homeMenu.png'),
+  box: require('./boxMenu.png'),
+  payment: require('./payment.png'),
+  person: require('./person.png'),
+  settings: require('./settingsMenu.png'),
+  logout: require('./logout.png'),
 };
 
 type Props = {

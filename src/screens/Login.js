@@ -18,13 +18,13 @@ import InputText from '../components/base/InputText';
 import Icon from '../assets/icons';
 import Button from '../components/base/Button';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {login, setFromLoginScreen} from '../redux/action';
+import {login, setFromLoginScreen, saveUserToken} from '../redux/action';
 import {connect} from 'react-redux';
 import db from '../assets/db.png';
 
 const Login = props => {
   const [username, setUsername] = useState('rahul');
-  const [password, setPassword] = useState('PEz6AW1R2#');
+  const [password, setPassword] = useState('abc@123');
 
   const onLoginPress = async () => {
     if (!username) {
@@ -60,6 +60,11 @@ const Login = props => {
       props.navigation.replace('Drawer');
 
       console.log('Login Response >>>>>', response);
+
+      if (props.deviceToken) {
+        props.saveUserToken(props.deviceToken);
+      }
+
       // props.navigation.push('Drawer');
     }
   };
@@ -114,11 +119,12 @@ const Login = props => {
 
 const mapStateToProps = state => ({
   isFetching: state.app.isFetching,
+  deviceToken: state.user.deviceToken,
 });
 
 export default connect(
   mapStateToProps,
-  {login, setFromLoginScreen},
+  {login, setFromLoginScreen, saveUserToken},
 )(Login);
 const styles = StyleSheet.create({
   root: {flex: 1},

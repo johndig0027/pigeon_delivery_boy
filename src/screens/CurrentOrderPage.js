@@ -20,9 +20,14 @@ import SmallButton from '../components/base/SmallButton';
 import Icon from '../assets/icons';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import db from '../assets/gmap.png';
+import {connect} from 'react-redux';
+import box from '../assets/icons/box.png';
+import deliveryBoy from '../assets/icons/delivery.png';
 
 const CurrentOrderPage = props => {
-  let mapObj = null;
+  const [lineCoordinate, setLineCoordinate] = useState([]);
+  const [userLocation, setUserLocation] = useState();
+  let mapObj = useRef();
   const mapTheme = [
     {
       elementType: 'geometry',
@@ -297,13 +302,81 @@ const CurrentOrderPage = props => {
   const openGoogleMap = (lat, lng) => {
     const scheme = Platform.select({ios: 'maps:0,0?q=', android: 'geo:0,0?q='});
     const latLng = `${lat},${lng}`;
-    const label = 'Custom Label';
+    const label = 'Delivery Location';
     const url = Platform.select({
       ios: `${scheme}${label}@${latLng}`,
       android: `${scheme}${latLng}(${label})`,
     });
 
     Linking.openURL(url);
+  };
+
+  useEffect(() => {
+    if (mapObj && userLocation) {
+      const MARKERS = [
+        {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+        },
+        {
+          latitude: props.selectedOrder.toAddress.latitude,
+          longitude: props.selectedOrder.toAddress.longitude,
+        },
+      ];
+      const DEFAULT_PADDING = {top: 70, right: 40, bottom: 80, left: 40};
+
+      mapObj.fitToCoordinates(MARKERS, {
+        edgePadding: DEFAULT_PADDING,
+        animated: true,
+      });
+
+      setLineCoordinate(MARKERS);
+      // updateStatus('COLLECTING');
+    }
+  }, [mapObj, userLocation]);
+
+  const getFormattedAddress = address => {
+    let formattedAddress = '';
+
+    if (address.houseNo) {
+      formattedAddress = address.houseNo + ', ';
+    }
+
+    if (address.apartment) {
+      formattedAddress = formattedAddress + address.apartment + ', ';
+    }
+
+    if (address.fullAddress) {
+      formattedAddress = formattedAddress + address.fullAddress + ', ';
+    }
+
+    if (address.city) {
+      formattedAddress = formattedAddress + address.city + ', ';
+    }
+
+    if (address.zipCode) {
+      formattedAddress = formattedAddress + address.zipCode + ', ';
+    }
+
+    if (address.state) {
+      formattedAddress = formattedAddress + address.state + ', ';
+    }
+
+    const lastCharacter = formattedAddress
+      .trim()
+      .substr(formattedAddress.length - 2);
+
+    if (lastCharacter === ',') {
+      formattedAddress = formattedAddress.substring(
+        0,
+        formattedAddress.length - 2,
+      );
+    }
+    if (address.landmark) {
+      formattedAddress = formattedAddress + '\nLandmark:' + address.landmark;
+    }
+
+    return formattedAddress;
   };
 
   return (
@@ -319,7 +392,7 @@ const CurrentOrderPage = props => {
       </View>
       <View style={styles.subParent}>
         <Hedear
-          text={'Start Order'}
+          text={'Order InProgress'}
           style={{fontSize: 20, marginVertical: 10, marginLeft: 10}}
         />
         <View style={styles.mapParent}>
@@ -328,19 +401,55 @@ const CurrentOrderPage = props => {
             style={{height: '100%'}}
             provider={PROVIDER_GOOGLE}
             customMapStyle={mapTheme}
-            initialRegion={{
-              latitude: 18.508357,
-              longitude: 73.810067,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
+            showsUserLocation={true}
             scrollEnabled={false}
-          />
+            onUserLocationChange={coordinate => {
+              setUserLocation(coordinate.nativeEvent.coordinate);
+              console.log('XXXXXXXXXXXX :', coordinate.nativeEvent.coordinate);
+            }}>
+            {userLocation ? (
+              <Marker
+                coordinate={{
+                  latitude: Number(userLocation.latitude),
+                  longitude: Number(userLocation.longitude),
+                }}
+                calloutAnchor={{x: 0.45, y: 0.3}}
+                icon={deliveryBoy}
+                tracksViewChanges={false}
+              />
+            ) : null}
+
+            <Marker
+              coordinate={{
+                latitude: Number(props.selectedOrder.toAddress.latitude),
+                longitude: Number(props.selectedOrder.toAddress.longitude),
+              }}
+              calloutAnchor={{x: 0.45, y: 0.3}}
+              icon={box}
+              tracksViewChanges={false}
+            />
+
+            {lineCoordinate && lineCoordinate.length === 2 ? (
+              <Polyline
+                coordinates={lineCoordinate}
+                strokeColor="#000"
+                fillColor={Colors.appBlue}
+                strokeWidth={3}
+                geodesic={true}
+                lineDashPhase={2}
+              />
+            ) : null}
+          </MapView>
 
           <View style={styles.directionButtonparent}>
             <TouchableOpacity
               style={styles.registerButton}
-              onPress={() => openGoogleMap(18.506811, 73.807063)}>
+              onPress={() =>
+                openGoogleMap(
+                  props.selectedOrder.toAddress.latitude,
+                  props.selectedOrder.toAddress.longitude,
+                )
+              }>
               <View style={styles.blankView} />
               <Text style={styles.registerText}>SHOW DIRECTION ON MAP</Text>
               <View style={styles.registerButtonRightCorner}>
@@ -356,37 +465,36 @@ const CurrentOrderPage = props => {
               <View style={styles.listSubItem}>
                 <Text style={styles.labelText}>From Location</Text>
                 <Text style={styles.valueText} numberOfLines={2}>
-                  Unit No. 4, 9th Floor, Building No.20, MindSpace IT Park,
-                  Hi-Tec City Madhapur, Hyderabad, AP 500 081 India
+                  {getFormattedAddress(props.selectedOrder.fromAddress)}
                 </Text>
               </View>
               <View style={styles.listDivider} />
               <View style={styles.listSubItem}>
                 <Text style={styles.labelText}>To Location</Text>
                 <Text style={styles.valueText} numberOfLines={2}>
-                  Unit No. 4, 9th Floor, Building No.20, MindSpace IT Park,
-                  Hi-Tec City Madhapur, Hyderabad, AP 500 081 India
+                  {getFormattedAddress(props.selectedOrder.toAddress)}
                 </Text>
               </View>
               <View style={styles.listDivider} />
               <View style={styles.listSubItem}>
                 <Text style={styles.labelText}>Mobile Numbers</Text>
                 <Text style={styles.valueText} numberOfLines={1}>
-                  +91 9878783238,+91 9878783238,
+                  {props.selectedOrder.toMobileNumber}
                 </Text>
               </View>
               <View style={styles.listDivider} />
               <View style={styles.listSubItem}>
                 <Text style={styles.labelText}>Package Weight</Text>
                 <Text style={styles.valueText} numberOfLines={1}>
-                  3.5 KG
+                  {parseFloat(props.selectedOrder.weight).toFixed(2) + ' KG'}
                 </Text>
               </View>
               <View style={styles.listDivider} />
               <View style={styles.listSubItem}>
                 <Text style={styles.labelText}>Total Cost</Text>
                 <Text style={styles.valueText} numberOfLines={1}>
-                  100.20/- INR
+                  {'₹ ' +
+                    parseFloat(props.selectedOrder.finalAnount).toFixed(2)}
                 </Text>
               </View>
               <View style={styles.listDivider} />
@@ -412,7 +520,24 @@ const CurrentOrderPage = props => {
   );
 };
 
-export default CurrentOrderPage;
+// export default CurrentOrderPage;
+
+const mapStateToProps = state => ({
+  userDetails: state.user.userDetails,
+  selectedOrder: state.order.selectedOrder,
+});
+
+// export default SearchLocation;
+export default connect(
+  mapStateToProps,
+  {
+    // setSelectedOrder,
+    // updateOrderStatus,
+    // updateSelectedOrderStatus,
+    // startLocationTracking,
+  },
+)(CurrentOrderPage);
+
 const styles = StyleSheet.create({
   root: {flex: 1, backgroundColor: 'white'},
   container: {
