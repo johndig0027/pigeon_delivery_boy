@@ -4,6 +4,7 @@ import LiveOrderList from '../screens/LiveOrderList';
 import CompletedOrders from '../screens/CompletedOrders';
 import OrderNavigator from './OrderNavigator';
 import DrawerView from '../screens/DrawerView';
+import Profile from './ProfileNavigator';
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = props => (
@@ -20,6 +21,13 @@ const DrawerNavigator = props => (
     <Drawer.Screen
       name="CompletedOrders"
       component={CompletedOrders}
+      options={{
+        header: null,
+      }}
+    />
+    <Drawer.Screen
+      name="Profile"
+      component={Profile}
       options={{
         header: null,
       }}

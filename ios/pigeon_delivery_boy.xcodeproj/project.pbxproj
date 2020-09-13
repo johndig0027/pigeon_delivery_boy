@@ -25,6 +25,7 @@
 		7A1C302253DB4E95A68F0CCC /* ProzaLibre-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 56DBE87AF91A4938B9BAD127 /* ProzaLibre-SemiBold.ttf */; };
 		840F9FA62BED45849AEBDC62 /* ProzaLibre-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 97D7FD59047C4279A84BE7EA /* ProzaLibre-Italic.ttf */; };
 		87A65676C7494FCD8648A138 /* ProzaLibre-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 938C5E5C43A94FE58BEF2327 /* ProzaLibre-BoldItalic.ttf */; };
+		AD0A60FB250E801F006301C0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AD0A60FA250E801F006301C0 /* GoogleService-Info.plist */; };
 		ADA1EBFE24A496770051159C /* ProzaLibre-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ADA1EBFD24A496770051159C /* ProzaLibre-Bold.ttf */; };
 		BB1CED854BD7425CA1ADBE3F /* ProzaLibre-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6825C527509243AF803CACE5 /* ProzaLibre-MediumItalic.ttf */; };
 		D25C6A8E917E63BC640C567B /* libPods-pigeon_delivery_boy-pigeon_delivery_boyTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 210FD2C576BF04FCAAC8D17A /* libPods-pigeon_delivery_boy-pigeon_delivery_boyTests.a */; };
@@ -88,6 +89,8 @@
 		82CE5FD4B84F487EB72E814D /* ProzaLibre-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProzaLibre-Medium.ttf"; path = "../assets/fonts/ProzaLibre-Medium.ttf"; sourceTree = "<group>"; };
 		938C5E5C43A94FE58BEF2327 /* ProzaLibre-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProzaLibre-BoldItalic.ttf"; path = "../assets/fonts/ProzaLibre-BoldItalic.ttf"; sourceTree = "<group>"; };
 		97D7FD59047C4279A84BE7EA /* ProzaLibre-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProzaLibre-Italic.ttf"; path = "../assets/fonts/ProzaLibre-Italic.ttf"; sourceTree = "<group>"; };
+		AD0A60F9250E67FF006301C0 /* Pigeon Delivery Boy.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Pigeon Delivery Boy.entitlements"; path = "pigeon_delivery_boy/Pigeon Delivery Boy.entitlements"; sourceTree = "<group>"; };
+		AD0A60FA250E801F006301C0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ADA1EBE924A495B30051159C /* PL-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PL-Italic.ttf"; sourceTree = "<group>"; };
 		ADA1EBEA24A495B30051159C /* PL-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PL-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
 		ADA1EBEB24A495B30051159C /* PL-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PL-MediumItalic.ttf"; sourceTree = "<group>"; };
@@ -166,6 +169,7 @@
 		13B07FAE1A68108700A75B9A /* pigeon_delivery_boy */ = {
 			isa = PBXGroup;
 			children = (
+				AD0A60F9250E67FF006301C0 /* Pigeon Delivery Boy.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -215,6 +219,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				AD0A60FA250E801F006301C0 /* GoogleService-Info.plist */,
 				ADA1EBFD24A496770051159C /* ProzaLibre-Bold.ttf */,
 				ADA1EBF024A495B30051159C /* PL-Bold.ttf */,
 				ADA1EBED24A495B30051159C /* PL-BoldItalic.ttf */,
@@ -432,6 +437,7 @@
 				33C389AF1F6641D29B5FAC64 /* ProzaLibre-Regular.ttf in Resources */,
 				7A1C302253DB4E95A68F0CCC /* ProzaLibre-SemiBold.ttf in Resources */,
 				0F9913A202E548A2BEC7C713 /* ProzaLibre-SemiBoldItalic.ttf in Resources */,
+				AD0A60FB250E801F006301C0 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -767,6 +773,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "pigeon_delivery_boy/Pigeon Delivery Boy.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -780,7 +787,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pigeon.db;
 				PRODUCT_NAME = "Pigeon Delivery Boy";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -794,6 +801,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "pigeon_delivery_boy/Pigeon Delivery Boy.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = pigeon_delivery_boy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -802,7 +810,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pigeon.db;
 				PRODUCT_NAME = "Pigeon Delivery Boy";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

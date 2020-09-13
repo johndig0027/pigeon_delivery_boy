@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>732743233427-ae8lc6tj5e9dr6hmtfv5c6c0q997j2k0.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.732743233427-ae8lc6tj5e9dr6hmtfv5c6c0q997j2k0</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDu-WJTkuDxBsi9FJjU9vKoKE66cZQIOH8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>732743233427</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.pigeon.db</string>
+	<key>PROJECT_ID</key>
+	<string>pigeon-271207</string>
+	<key>STORAGE_BUCKET</key>
+	<string>pigeon-271207.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:732743233427:ios:7c8f78397c4396a90e0266</string>
+	<key>DATABASE_URL</key>
+	<string>https://pigeon-271207.firebaseio.com</string>
+</dict>
+</plist>

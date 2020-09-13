@@ -8,6 +8,7 @@ import CurrentOrderPage from '../screens/CurrentOrderPage';
 import CancelOrder from '../screens/CancelOrder';
 import AssignToNextDB from '../screens/AssignToNextDB';
 import FinalOTPScreen from '../screens/FinalOTPScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createStackNavigator();
 // const store = configureStore();

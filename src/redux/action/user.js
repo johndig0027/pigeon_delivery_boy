@@ -459,3 +459,40 @@ export const saveUserToken = token => async (dispatch, getState) => {
     return {error: err.message, response: null};
   }
 };
+
+export const updatePassword = request => async (dispatch, getState) => {
+  //   const {isNetwork, deviceToken} = getState().app;
+  //   if (!isNetwork) {
+  //     Alert.alert('Error', 'Please check your network connectivity');
+  //     return;
+  //   }
+  // console.log("Current Device Token :: CreateAccount::: ", deviceToken);
+
+  const {sessionToken} = getState().user;
+
+  try {
+    // dispatch(requestStarted());
+    const response = await postWithToken(
+      'user/changePassword',
+      request,
+      sessionToken,
+      dispatch,
+    );
+    console.log('change password Response', response);
+    dispatch(requestCompleted());
+    if (response.status === 200) {
+      // dispatch({
+      //   type: REGISTER_USER_RESPONSE,
+      //   payload: response.data,
+      // });
+      return {error: null, response: response.data};
+    } else {
+      Alert.alert('Error', response.data.message);
+      return {error: response.data.error, response: null};
+    }
+  } catch (err) {
+    dispatch(requestCompleted());
+    Alert.alert('Error', err.message);
+    return {error: err.message, response: null};
+  }
+};

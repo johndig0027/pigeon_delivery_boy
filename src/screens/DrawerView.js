@@ -123,7 +123,10 @@ const DrawerView = props => {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => props.navigation.toggleDrawer()}>
+            onPress={() => {
+              props.navigation.toggleDrawer();
+              props.navigation.navigate('Profile');
+            }}>
             <View style={styles.iconParent}>
               <Icon type={'person'} />
             </View>
