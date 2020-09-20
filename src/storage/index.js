@@ -32,6 +32,7 @@ export const getUserDetails = async () => {
 export const logOutUser = async () => {
   try {
     const data = await AsyncStorage.removeItem(config.USER_STORE);
+    removeOrder();
     // console.log("data", data);
     return [data];
   } catch (e) {

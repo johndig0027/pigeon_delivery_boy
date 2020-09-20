@@ -12,6 +12,7 @@ import {
   Keyboard,
   Linking,
   Platform,
+  Alert,
 } from 'react-native';
 import {Colors} from '../theme';
 import MapView, {PROVIDER_GOOGLE, Marker, Polyline} from 'react-native-maps';
@@ -23,8 +24,10 @@ import db from '../assets/gmap.png';
 import {connect} from 'react-redux';
 import box from '../assets/icons/box.png';
 import deliveryBoy from '../assets/icons/delivery.png';
+import {requestCompleteOrder} from '../redux/action';
 
 const CurrentOrderPage = props => {
+  console.log('Props CurrentOrderPage ::::', props);
   const [lineCoordinate, setLineCoordinate] = useState([]);
   const [userLocation, setUserLocation] = useState();
   let mapObj = useRef();
@@ -379,6 +382,20 @@ const CurrentOrderPage = props => {
     return formattedAddress;
   };
 
+  const completeOrder = async () => {
+    const request = {
+      str1: props.selectedOrder.pigeonId,
+    };
+
+    const {error, response} = await props.requestCompleteOrder(request);
+    console.log('Response request OTP:', response);
+    if (!error) {
+      props.navigation.push('FinalOTPScreen');
+    } else {
+      Alert.alert('Error', error);
+    }
+  };
+
   return (
     <View style={styles.root}>
       <View style={styles.navBarStyle}>
@@ -505,7 +522,7 @@ const CurrentOrderPage = props => {
             <SmallButton
               buttonStyle={styles.declineButton}
               text={'COMPLETE ORDER'}
-              onPress={() => props.navigation.push('FinalOTPScreen')}
+              onPress={() => completeOrder()}
             />
             <View style={{width: 10}} />
             <SmallButton
@@ -531,10 +548,7 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   {
-    // setSelectedOrder,
-    // updateOrderStatus,
-    // updateSelectedOrderStatus,
-    // startLocationTracking,
+    requestCompleteOrder,
   },
 )(CurrentOrderPage);
 

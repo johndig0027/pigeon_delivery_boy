@@ -7,22 +7,49 @@ import {
   Image,
   RefreshControl,
   Text,
-  TextInput,
-  KeyboardAvoidingView,
-  Keyboard,
-  Linking,
-  Platform,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import Icon from '../assets/icons';
 import {Colors} from '../theme';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import SmallButton from '../components/base/SmallButton';
+import {connect} from 'react-redux';
+import {completeOrder} from '../redux/action';
 const FinalOTPScreen = props => {
   const [code, setCode] = useState();
   const onCodeFilled = async codeText => {
     console.log(codeText);
     // setCodeFilled(true);
+  };
+
+  const onSubmitOrder = async () => {
+    if (!code) {
+      Alert.alert('Error', 'Please enter otp');
+      return;
+    }
+
+    if (code.length !== 6) {
+      Alert.alert('Error', 'Please enter valid otp');
+      return;
+    }
+
+    const request = {
+      orderId: props.selectedOrder.pigeonId,
+      otp: code,
+      completeWithKYC: '',
+      kycNumber: '',
+      completeWithKYCOther: '',
+      isCompleteWithOTP: true,
+      receiverName: '',
+    };
+
+    const {error, response} = await props.completeOrder(request);
+    if (!error) {
+      Alert.alert('Success', response.message);
+    } else {
+      Alert.alert('Error', error);
+    }
   };
 
   return (
@@ -41,6 +68,7 @@ const FinalOTPScreen = props => {
         <View
           style={{flex: 1, backgroundColor: 'white', justifyContent: 'center'}}>
           <View style={styles.dummyView} />
+          <Text style={styles.submitOtpText}>{props.completeOrderOTP}</Text>
           <Text style={styles.submitOtpText}>Submit OTP</Text>
           <OTPInputView
             style={styles.otpView}
@@ -56,11 +84,24 @@ const FinalOTPScreen = props => {
           />
         </View>
 
+        <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+          <SmallButton
+            text={'Return Order'}
+            buttonStyle={{width: '42%', alignSelf: 'center', marginTop: 30}}
+          />
+          <View style={{width: 20}} />
+          <SmallButton
+            text={'Complete With KYC'}
+            buttonStyle={{width: '42%', alignSelf: 'center', marginTop: 30}}
+          />
+        </View>
+
         <View style={{height: 100}}>
           <View style={styles.listDivider} />
           <SmallButton
             text={'Submit'}
             buttonStyle={{width: '50%', alignSelf: 'center', marginTop: 30}}
+            onPress={() => onSubmitOrder()}
           />
         </View>
       </View>
@@ -68,7 +109,15 @@ const FinalOTPScreen = props => {
   );
 };
 
-export default FinalOTPScreen;
+const mapStateToProps = state => ({
+  completeOrderOTP: state.order.completeOrderOTP,
+  selectedOrder: state.order.selectedOrder,
+});
+
+export default connect(
+  mapStateToProps,
+  {completeOrder},
+)(FinalOTPScreen);
 
 const styles = StyleSheet.create({
   root: {flex: 1, backgroundColor: 'white'},

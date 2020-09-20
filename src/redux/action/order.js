@@ -8,6 +8,7 @@ export const SET_SELECTED_ORDER = 'SET_SELECTED_ORDER';
 export const START_LOCATION_TRACKING = 'START_LOCATION_TRACKING';
 export const STOP_LOCATION_TRACKING = 'STOP_LOCATION_TRACKING';
 export const UPDATE_SELECTED_ORDER_STATUS = 'UPDATE_SELECTED_ORDER_STATUS';
+export const COMPLETE_ORDER_OTP = 'COMPLETE_ORDER_OTP';
 import {cloneDeep} from 'lodash';
 
 export const getLiveOrders = showProgress => async (dispatch, getState) => {
@@ -124,6 +125,81 @@ export const collectOrder = request => async (dispatch, getState) => {
       //   type: REGISTER_USER_RESPONSE,
       //   payload: response.data,
       // });
+      return {error: null, response: response.data};
+    } else {
+      Alert.alert('Error', response.data.message);
+      return {error: response.data.error, response: null};
+    }
+  } catch (err) {
+    dispatch(requestCompleted());
+    Alert.alert('Error', err.message);
+    return {error: err.message, response: null};
+  }
+};
+
+export const requestCompleteOrder = request => async (dispatch, getState) => {
+  //   const {isNetwork, deviceToken} = getState().app;
+  //   if (!isNetwork) {
+  //     Alert.alert('Error', 'Please check your network connectivity');
+  //     return;
+  //   }
+  // console.log("Current Device Token :: CreateAccount::: ", deviceToken);
+
+  const {sessionToken} = getState().user;
+
+  try {
+    // dispatch(requestStarted());
+    const response = await postWithToken(
+      'order/sendCompleteOTP',
+      request,
+      sessionToken,
+      dispatch,
+    );
+    console.log('Response', response);
+    dispatch(requestCompleted());
+    if (response.status === 200) {
+      dispatch({
+        type: COMPLETE_ORDER_OTP,
+        payload: response.data.str1,
+      });
+      return {error: null, response: response.data};
+    } else {
+      Alert.alert('Error', response.data.message);
+      return {error: response.data.error, response: null};
+    }
+  } catch (err) {
+    dispatch(requestCompleted());
+    Alert.alert('Error', err.message);
+    return {error: err.message, response: null};
+  }
+};
+
+export const completeOrder = request => async (dispatch, getState) => {
+  //   const {isNetwork, deviceToken} = getState().app;
+  //   if (!isNetwork) {
+  //     Alert.alert('Error', 'Please check your network connectivity');
+  //     return;
+  //   }
+  // console.log("Current Device Token :: CreateAccount::: ", deviceToken);
+
+  const {sessionToken} = getState().user;
+
+  try {
+    // dispatch(requestStarted());
+    const response = await postWithToken(
+      'order/completeOrder',
+      request,
+      sessionToken,
+      dispatch,
+    );
+    console.log('Response', response);
+    dispatch(requestCompleted());
+    if (response.status === 200) {
+      // dispatch({
+      //   type: COMPLETE_ORDER_OTP,
+      //   payload: response.data.str1,
+      // });
+
       return {error: null, response: response.data};
     } else {
       Alert.alert('Error', response.data.message);

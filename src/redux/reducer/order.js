@@ -8,6 +8,7 @@ const initialState = {
   selectedOrder: undefined,
   locationTracking: false,
   completedOrderList: [],
+  completeOrderOTP: undefined,
 };
 
 const orderReducers = (state = initialState, action) => {
@@ -47,6 +48,12 @@ const orderReducers = (state = initialState, action) => {
       return {
         ...state,
         locationTracking: true,
+      };
+    }
+    case actionTypes.COMPLETE_ORDER_OTP: {
+      return {
+        ...state,
+        completeOrderOTP: action.payload,
       };
     }
     case actionTypes.STOP_LOCATION_TRACKING: {
