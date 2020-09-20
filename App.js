@@ -12,7 +12,7 @@ import {Provider} from 'react-redux';
 import DeliveryBoyContainer from './src/screens/DeliveryBoyContainer';
 import configureStore from './src/redux/store';
 const store = configureStore();
-console.disableYellowBox = true;
+// console.disableYellowBox = true;
 
 const App = () => {
   return (
